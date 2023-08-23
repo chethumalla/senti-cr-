@@ -1,0 +1,26 @@
+import os
+import re
+import pandas as pd
+import numpy as np
+so_df = pd.read_csv("IST_dataset/All_with_ID_Text.csv",delimiter=";")
+so_df.head()
+so_df.info()
+len(so_df["PostId"].unique())
+req_df = so_df[["PostId","QuestionText"]]
+req_df.head()
+req_df = req_df[~req_df["QuestionText"].isna()]
+req_df = req_df.reset_index(drop=True)
+req_df.info()
+def preprocess_text(text):
+    # Remove unwanted characters (non-alphanumeric, non-space)
+    text = re.sub(r'[^a-zA-Z0-9\s]', '', text)
+    # Remove extra spaces, tabs, and newlines
+    text = re.sub(r'\s+', ' ', text.strip())
+    # Remove Unicode characters
+    text = text.encode('ascii', 'ignore').decode()
+    return text
+    req_df['Text'] = req_df['QuestionText'].apply(preprocess_text)
+req_df = req_df.rename(columns={"PostId":"ID"})
+req_df = req_df[["ID","Text"]]
+req_df[req_df["Text"]==""]
+
